@@ -18,16 +18,7 @@ jobs:
           esp_idf_version: v5.5
           target: esp32s3
           path: '.'
-
-      - name: Generate Signing Key (if not present)
-        run: |
-          if [ ! -f signing_key.pem ]; then
-            espsecure.py generate_signing_key --version 2 signing_key.pem
-          fi
-
-      - name: Build Firmware
-        run: |
-          idf.py build
+          command: idf.py build
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
