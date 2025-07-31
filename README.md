@@ -6,6 +6,7 @@ This project demonstrates how to use **Secure Boot V2** with **HTTPS OTA updates
 ✅ Auto-generated `metadata.json` for OTA updates
 ✅ Version check before downloading new firmware
 ✅ GitHub Actions CI to build and sign firmware
+✅ Support for reproducible builds with `sdkconfig.defaults`
 
 ---
 
@@ -20,6 +21,7 @@ esp32-secure-ota/
  ├─ partitions.csv           # Partition table with OTA support
  ├─ tools/
  │   └─ gen_metadata.py      # Generates metadata.json
+ ├─ sdkconfig.defaults       # Default ESP-IDF config for reproducible builds
  └─ .github/workflows/
      └─ build.yml           # CI build pipeline
 ```
@@ -50,6 +52,28 @@ The build will produce:
 build/esp32_secure_ota-signed.bin  # Signed firmware
 build/metadata.json                # OTA metadata (version, URL, hash)
 ```
+
+---
+
+## ⚙️ Managing `sdkconfig` and `sdkconfig.defaults`
+
+To create a reproducible configuration for CI, generate `sdkconfig.defaults` from your current `sdkconfig`:
+
+```bash
+idf.py save-defconfig
+```
+
+This creates a minimal `sdkconfig.defaults` with only non-default options.
+
+### 🛠 Using in CI
+
+When building in CI:
+
+```bash
+idf.py defconfig build
+```
+
+This regenerates `sdkconfig` from `sdkconfig.defaults` and builds the firmware.
 
 ---
 
@@ -146,9 +170,7 @@ git push origin v1.0.1
 ## ⚠️ Important Notes
 
 🔒 Secure Boot eFuse burning is **irreversible**.
-
 🔒 Always back up `signing_key.pem`. If lost, you can never update the device again.
-
 🔒 The same key must be used for all future firmware updates.
 
 ---
@@ -168,3 +190,4 @@ git push origin v1.0.1
 ✔️ OTA updates via HTTPS are automatic and secure
 ✔️ Version checking prevents unnecessary downloads
 ✔️ GitHub Actions can automate build, signing, and release
+✔️ `sdkconfig.defaults` ensures reproducible builds in CI
