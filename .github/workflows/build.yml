@@ -1,0 +1,30 @@
+name: ESP32 Secure OTA Build
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: espressif/setup-esp-idf@v1
+        with:
+          esp_idf_version: v5.2
+      - name: Generate Signing Key (if not present)
+        run: |
+          if [ ! -f signing_key.pem ]; then
+            espsecure.py generate_signing_key --version 2 signing_key.pem
+          fi
+      - name: Build Firmware
+        run: |
+          idf.py build
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware
+          path: |
+            build/esp32_secure_ota-signed.bin
+            build/metadata.json
