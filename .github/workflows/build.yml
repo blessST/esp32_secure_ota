@@ -9,18 +9,24 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: espressif/setup-esp-idf@v1
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up ESP-IDF v5.5
+        uses: espressif/setup-esp-idf@latest
         with:
-          esp_idf_version: v5.2
+          esp_idf_version: v5.5
+
       - name: Generate Signing Key (if not present)
         run: |
           if [ ! -f signing_key.pem ]; then
             espsecure.py generate_signing_key --version 2 signing_key.pem
           fi
+
       - name: Build Firmware
         run: |
           idf.py build
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
